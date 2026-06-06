@@ -205,6 +205,7 @@ public partial class Form1 : Form
         };
         tabs.TabPages.Add(BuildSettingsTab());
         tabs.TabPages.Add(BuildStatsTab());
+        tabs.TabPages.Add(BuildAboutTab());
         return tabs;
     }
 
@@ -307,6 +308,62 @@ public partial class Form1 : Form
 
         tab.Controls.Add(panel);
         return tab;
+    }
+
+    private TabPage BuildAboutTab()
+    {
+        var tab = new TabPage("О проекте");
+        var panel = new TableLayoutPanel
+        {
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            ColumnCount = 1,
+            RowCount = 2,
+            Padding = new Padding(10)
+        };
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 78));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
+
+        panel.Controls.Add(new Label
+        {
+            Text = "К проекту подключен notebook typing-trainer-notebook.ipynb. Его можно открыть из приложения для просмотра материалов проекта.",
+            Dock = DockStyle.Fill,
+            TextAlign = ContentAlignment.MiddleLeft
+        }, 0, 0);
+
+        var openNotebookButton = new Button
+        {
+            Text = "Открыть notebook",
+            Dock = DockStyle.Fill
+        };
+        openNotebookButton.Click += (_, _) => OpenNotebook();
+        panel.Controls.Add(openNotebookButton, 0, 1);
+
+        tab.Controls.Add(panel);
+        return tab;
+    }
+
+    private void OpenNotebook()
+    {
+        var notebookPath = Path.Combine(AppContext.BaseDirectory, "typing-trainer-notebook.ipynb");
+        if (!File.Exists(notebookPath))
+        {
+            MessageBox.Show("Файл typing-trainer-notebook.ipynb не найден в папке запуска.", "Notebook", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = notebookPath,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Не удалось открыть notebook.\n{ex.Message}", "Notebook", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
 
     private static Label CreateMetricLabel(string text)
