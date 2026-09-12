@@ -30,4 +30,8 @@ public sealed class TypingSessionStats
     public double Seconds { get; set; }
     public double Accuracy { get; set; }
     public double WordsPerMinute { get; set; }
+
+    // Preserve the JSON field used by previously saved sessions.
+    [System.Text.Json.Serialization.JsonIgnore]
+    public double CharactersPerMinute => WordsPerMinute;
 }

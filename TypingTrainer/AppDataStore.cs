@@ -11,7 +11,7 @@ public sealed class AppDataStore
 
     private readonly string _dataDirectory;
 
-    public AppDataStore()
+    public AppDataStore(string? dataDirectory = null)
     {
         var root = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         if (string.IsNullOrWhiteSpace(root))
@@ -19,8 +19,7 @@ public sealed class AppDataStore
             root = AppContext.BaseDirectory;
         }
 
-        _dataDirectory = Path.Combine(root, "TypingTrainer");
-        Directory.CreateDirectory(_dataDirectory);
+        _dataDirectory = dataDirectory ?? Path.Combine(root, "TypingTrainer");
     }
 
     private string SettingsPath => Path.Combine(_dataDirectory, "settings.json");
@@ -34,13 +33,13 @@ public sealed class AppDataStore
     public TrainerSettings LoadSettings()
     {
         var settings = Load<TrainerSettings>(SettingsPath) ?? new TrainerSettings();
-        settings.FontSize = Math.Clamp(settings.FontSize, 10f, 30f);
+        settings.FontSize = float.IsFinite(settings.FontSize) ? Math.Clamp(settings.FontSize, 10f, 30f) : 16f;
         return settings;
     }
 
     public void SaveSettings(TrainerSettings settings)
     {
-        settings.FontSize = Math.Clamp(settings.FontSize, 10f, 30f);
+        settings.FontSize = float.IsFinite(settings.FontSize) ? Math.Clamp(settings.FontSize, 10f, 30f) : 16f;
         Save(SettingsPath, settings);
     }
 
@@ -69,7 +68,7 @@ public sealed class AppDataStore
             var json = File.ReadAllText(path);
             return JsonSerializer.Deserialize<T>(json, JsonOptions);
         }
-        catch
+        catch (JsonException)
         {
             return default;
         }
@@ -78,7 +77,17 @@ public sealed class AppDataStore
     private static void Save<T>(string path, T value)
     {
         var json = JsonSerializer.Serialize(value, JsonOptions);
-        File.WriteAllText(path, json);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        var temporaryPath = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            File.WriteAllText(temporaryPath, json);
+            File.Move(temporaryPath, path, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
+        }
     }
 
     private static List<WordDictionary> CreateDefaultTexts()

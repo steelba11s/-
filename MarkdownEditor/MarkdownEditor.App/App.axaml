@@ -1,0 +1,33 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="MarkdownEditor.App.App" RequestedThemeVariant="Light">
+  <Application.Styles>
+    <FluentTheme />
+    <Style Selector="Window">
+      <Setter Property="FontFamily" Value="Segoe UI" />
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="Foreground" Value="#252B32" />
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="MinHeight" Value="34" />
+    </Style>
+    <Style Selector="Button.tool">
+      <Setter Property="Width" Value="36" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="Padding" Value="7" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="#68717C" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="RadioButton.mode">
+      <Setter Property="Theme" Value="{StaticResource {x:Type ToggleButton}}" />
+      <Setter Property="Padding" Value="10,6" />
+      <Setter Property="MinHeight" Value="32" />
+      <Setter Property="CornerRadius" Value="3" />
+    </Style>
+  </Application.Styles>
+</Application>

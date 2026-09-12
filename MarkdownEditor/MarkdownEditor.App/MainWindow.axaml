@@ -1,0 +1,166 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:MarkdownEditor.App"
+        x:Class="MarkdownEditor.App.MainWindow" x:DataType="local:EditorViewModel"
+        Title="{Binding WindowTitle}" Width="1320" Height="840"
+        MinWidth="1000" MinHeight="640" Background="#F5F6F8"
+        WindowStartupLocation="CenterScreen">
+  <Window.KeyBindings>
+    <KeyBinding Gesture="Ctrl+N" Command="{Binding NewCommand}" />
+    <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenCommand}" />
+    <KeyBinding Gesture="Ctrl+Shift+O" Command="{Binding OpenFolderCommand}" />
+    <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveCommand}" />
+    <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveAsCommand}" />
+    <KeyBinding Gesture="Ctrl+E" Command="{Binding ExportCommand}" />
+  </Window.KeyBindings>
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <Menu Background="White">
+      <MenuItem Header="Файл">
+        <MenuItem Header="Новый документ" Command="{Binding NewCommand}" InputGesture="Ctrl+N" />
+        <MenuItem Header="Открыть файл…" Command="{Binding OpenCommand}" InputGesture="Ctrl+O" />
+        <MenuItem Header="Открыть папку…" Command="{Binding OpenFolderCommand}" InputGesture="Ctrl+Shift+O" />
+        <Separator />
+        <MenuItem Header="Сохранить" Command="{Binding SaveCommand}" InputGesture="Ctrl+S" />
+        <MenuItem Header="Сохранить как…" Command="{Binding SaveAsCommand}" InputGesture="Ctrl+Shift+S" />
+        <MenuItem Header="Экспорт в HTML…" Command="{Binding ExportCommand}" InputGesture="Ctrl+E" />
+        <Separator />
+        <MenuItem Header="Выход" Click="ExitClick" />
+      </MenuItem>
+      <MenuItem Header="Правка">
+        <MenuItem Header="Отменить" Click="UndoClick" InputGesture="Ctrl+Z" />
+        <MenuItem Header="Повторить" Click="RedoClick" InputGesture="Ctrl+Y" />
+        <Separator />
+        <MenuItem Header="Найти" Click="FindClick" InputGesture="Ctrl+F" />
+      </MenuItem>
+    </Menu>
+    <Border Grid.Row="1" Background="White" BorderBrush="#DCE1E5" BorderThickness="0,0,0,1" Padding="16,10">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <LucideIcon Kind="NotebookPen" Size="23" Foreground="#177452" />
+          <TextBlock Text="Markdown" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,16,0" />
+          <Button x:Name="NewButton" Classes="tool" Command="{Binding NewCommand}" ToolTip.Tip="Новый документ (Ctrl+N)"><LucideIcon Kind="FilePlus" Size="19" /></Button>
+          <Button Classes="tool" Command="{Binding OpenCommand}" ToolTip.Tip="Открыть файл (Ctrl+O)"><LucideIcon Kind="FileText" Size="19" /></Button>
+          <Button Classes="tool" Command="{Binding OpenFolderCommand}" ToolTip.Tip="Открыть папку (Ctrl+Shift+O)"><LucideIcon Kind="FolderOpen" Size="19" /></Button>
+          <Border Width="1" Height="22" Background="#DCE1E5" Margin="4,0" />
+          <Button x:Name="SaveButton" Command="{Binding SaveCommand}" Background="#177452" Foreground="White" Padding="12,6">
+            <StackPanel Orientation="Horizontal" Spacing="8"><LucideIcon Kind="Save" Size="17" /><TextBlock Text="Сохранить" /></StackPanel>
+          </Button>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
+          <RadioButton x:Name="EditorMode" Classes="mode" GroupName="View" Click="ModeClick" ToolTip.Tip="Только редактор"><LucideIcon Kind="Code" Size="18" /></RadioButton>
+          <RadioButton x:Name="SplitMode" Classes="mode" GroupName="View" IsChecked="True" Click="ModeClick" ToolTip.Tip="Редактор и предпросмотр"><LucideIcon Kind="Columns2" Size="18" /></RadioButton>
+          <RadioButton x:Name="PreviewMode" Classes="mode" GroupName="View" Click="ModeClick" ToolTip.Tip="Только предпросмотр"><LucideIcon Kind="Eye" Size="18" /></RadioButton>
+          <Border Width="1" Height="22" Background="#DCE1E5" Margin="10,0" />
+          <Button Command="{Binding ExportCommand}" Padding="12,6"><StackPanel Orientation="Horizontal" Spacing="8"><LucideIcon Kind="Download" Size="17" /><TextBlock Text="HTML" /></StackPanel></Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+    <Grid Grid.Row="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="220" MinWidth="180" MaxWidth="350" />
+        <ColumnDefinition Width="5" />
+        <ColumnDefinition Width="*" MinWidth="640" />
+      </Grid.ColumnDefinitions>
+      <Grid RowDefinitions="Auto,*,Auto" Background="#F5F6F8">
+        <Grid Margin="16,12,8,8" ColumnDefinitions="*,Auto">
+          <TextBlock Classes="muted" Text="{Binding FolderName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding FolderPath}" />
+          <Button Grid.Column="1" Classes="tool" Command="{Binding RefreshCommand}" ToolTip.Tip="Обновить список файлов"><LucideIcon Kind="RefreshCw" Size="16" /></Button>
+        </Grid>
+        <TreeView x:Name="FileTree" Grid.Row="1" ItemsSource="{Binding Tree}" Background="Transparent" SelectionChanged="FileSelected" IsEnabled="{Binding IsEditable}">
+          <TreeView.ItemTemplate>
+            <TreeDataTemplate x:DataType="local:FileNode" ItemsSource="{Binding Children}">
+              <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,3">
+                <LucideIcon Kind="Folder" Size="16" IsVisible="{Binding IsDirectory}" Foreground="#68717C" />
+                <LucideIcon Kind="FileText" Size="16" IsVisible="{Binding !IsDirectory}" Foreground="#177452" />
+                <TextBlock Text="{Binding Name}" ToolTip.Tip="{Binding FullPath}" />
+              </StackPanel>
+            </TreeDataTemplate>
+          </TreeView.ItemTemplate>
+        </TreeView>
+        <Button Grid.Row="2" Command="{Binding OpenFolderCommand}" Margin="12" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+          <StackPanel Orientation="Horizontal" Spacing="8"><LucideIcon Kind="FolderOpen" Size="17" /><TextBlock Text="Открыть папку" /></StackPanel>
+        </Button>
+      </Grid>
+      <GridSplitter Grid.Column="1" Background="#E2E6E9" ResizeDirection="Columns" MinWidth="5" />
+      <Grid Grid.Column="2" RowDefinitions="Auto,Auto,*,Auto" Background="White">
+        <Grid ColumnDefinitions="*,Auto" Margin="18,12">
+          <StackPanel Spacing="3">
+            <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="15" TextTrimming="CharacterEllipsis" />
+            <TextBlock Classes="muted" Text="{Binding PathDisplay}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding PathDisplay}" />
+          </StackPanel>
+          <TextBlock Grid.Column="1" Text="{Binding SaveState}" Foreground="#177452" FontSize="12" VerticalAlignment="Center" Margin="12,0,0,0" />
+        </Grid>
+        <Border Grid.Row="1" BorderBrush="#E2E6E9" BorderThickness="0,1" Padding="10,5">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Orientation="Horizontal" Spacing="2" IsEnabled="{Binding IsEditable}">
+              <Button Classes="tool" Click="FormatClick" Tag="heading" ToolTip.Tip="Заголовок"><LucideIcon Kind="Heading1" Size="18" /></Button>
+              <Button x:Name="BoldButton" Classes="tool" Click="FormatClick" Tag="bold" ToolTip.Tip="Жирный (Ctrl+B)"><LucideIcon Kind="Bold" Size="18" /></Button>
+              <Button Classes="tool" Click="FormatClick" Tag="italic" ToolTip.Tip="Курсив (Ctrl+I)"><LucideIcon Kind="Italic" Size="18" /></Button>
+              <Button Classes="tool" Click="FormatClick" Tag="code" ToolTip.Tip="Код"><LucideIcon Kind="Code" Size="18" /></Button>
+              <Button Classes="tool" Click="FormatClick" Tag="link" ToolTip.Tip="Ссылка"><LucideIcon Kind="Link" Size="18" /></Button>
+              <Button Classes="tool" Click="FormatClick" Tag="list" ToolTip.Tip="Список"><LucideIcon Kind="List" Size="18" /></Button>
+              <Button Classes="tool" Click="FormatClick" Tag="quote" ToolTip.Tip="Цитата"><LucideIcon Kind="Quote" Size="18" /></Button>
+              <Border Width="1" Background="#E2E6E9" Margin="8,5" />
+              <Button Classes="tool" Click="UndoClick" ToolTip.Tip="Отменить (Ctrl+Z)"><LucideIcon Kind="Undo2" Size="18" /></Button>
+              <Button Classes="tool" Click="RedoClick" ToolTip.Tip="Повторить (Ctrl+Y)"><LucideIcon Kind="Redo2" Size="18" /></Button>
+            </StackPanel>
+            <Button Grid.Column="1" Classes="tool" Click="FindClick" ToolTip.Tip="Поиск (Ctrl+F)"><LucideIcon Kind="Search" Size="18" /></Button>
+          </Grid>
+        </Border>
+        <Grid x:Name="DocumentGrid" Grid.Row="2">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="280" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="*" MinWidth="280" />
+          </Grid.ColumnDefinitions>
+          <Grid x:Name="EditorPane" RowDefinitions="32,*">
+            <TextBlock Classes="muted" Text="РЕДАКТОР" Margin="18,8" FontSize="11" />
+            <TextBox x:Name="Editor" Grid.Row="1" Text="{Binding DocumentText, Mode=TwoWay}" IsEnabled="{Binding IsEditable}"
+                     AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap" FontFamily="Consolas, monospace"
+                     FontSize="15" LineHeight="24" Padding="18,8,18,24" BorderThickness="0" Background="White"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     PlaceholderText="" />
+          </Grid>
+          <GridSplitter x:Name="DocumentSplitter" Grid.Column="1" Background="#E2E6E9" ResizeDirection="Columns" />
+          <Grid x:Name="PreviewPane" Grid.Column="2" RowDefinitions="32,*">
+            <TextBlock Classes="muted" Text="ПРЕДПРОСМОТР" Margin="22,8" FontSize="11" />
+            <ScrollViewer x:Name="PreviewScroller" Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+              <StackPanel x:Name="PreviewContent" Margin="22,8,22,28" Spacing="14" />
+            </ScrollViewer>
+          </Grid>
+        </Grid>
+        <Border x:Name="SearchPanel" Grid.Row="3" IsVisible="False" BorderBrush="#DCE1E5" BorderThickness="0,1,0,0" Background="#F8F9FA" Padding="14,10">
+          <Grid RowDefinitions="Auto,Auto,Auto">
+            <Grid ColumnDefinitions="*,145,Auto,Auto" ColumnSpacing="10">
+              <TextBox x:Name="SearchBox" Text="{Binding Query, Mode=TwoWay}" PlaceholderText="Найти текст" />
+              <ComboBox Grid.Column="1" SelectedIndex="{Binding SearchScope}" HorizontalAlignment="Stretch">
+                <ComboBoxItem Content="В документе" /><ComboBoxItem Content="В папке" />
+              </ComboBox>
+              <CheckBox Grid.Column="2" Content="Aa" IsChecked="{Binding MatchCase}" ToolTip.Tip="Учитывать регистр" />
+              <Button Grid.Column="3" Classes="tool" Click="CloseSearchClick" ToolTip.Tip="Закрыть поиск"><LucideIcon Kind="X" Size="17" /></Button>
+            </Grid>
+            <TextBlock Grid.Row="1" Classes="muted" Text="{Binding SearchSummary}" Margin="2,8" />
+            <ListBox x:Name="ResultsList" Grid.Row="2" ItemsSource="{Binding SearchResults}" MaxHeight="135" Background="Transparent" SelectionChanged="SearchSelected">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="local:SearchHit">
+                  <Grid ColumnDefinitions="190,*" Margin="0,3">
+                    <TextBlock Text="{Binding Location}" Foreground="#177452" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Path}" Margin="0,0,12,0" />
+                    <TextBlock Grid.Column="1" Text="{Binding Snippet}" TextTrimming="CharacterEllipsis" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </Grid>
+        </Border>
+      </Grid>
+    </Grid>
+    <Border Grid.Row="3" Background="#F0F3F4" BorderBrush="#DCE1E5" BorderThickness="0,1,0,0" Padding="16,7">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+        <TextBlock Classes="muted" Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+        <TextBlock x:Name="CaretStatus" Grid.Column="1" Classes="muted" Text="Стр. 1, стлб. 1" Margin="16,0" />
+        <TextBlock Grid.Column="2" Classes="muted" Text="{Binding Statistics}" Margin="16,0" />
+        <TextBlock Grid.Column="3" Classes="muted" Text="{Binding EncodingName}" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

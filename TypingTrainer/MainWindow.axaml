@@ -1,0 +1,82 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:TypingTrainer"
+        x:Class="TypingTrainer.MainWindow"
+        Title="Тренажёр набора текста" Width="1240" Height="800"
+        MinWidth="1000" MinHeight="700" Background="#F5F6F8"
+        WindowStartupLocation="CenterScreen">
+  <Window.Styles>
+    <Style Selector="TabItem">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="Padding" Value="8,10" />
+    </Style>
+  </Window.Styles>
+  <Grid Margin="20" ColumnDefinitions="*,340">
+    <Grid Margin="0,0,20,0" RowDefinitions="Auto,Auto,Auto,*,150,Auto">
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,16">
+        <TextBlock Text="Текст" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,12,0" />
+        <ComboBox x:Name="TextCombo" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="local:WordDictionary">
+              <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button x:Name="StartButton" Grid.Column="2" Content="Начать" Background="#167552" Foreground="White" Padding="20,8" Margin="0,0,8,0" />
+        <Button x:Name="ResetButton" Grid.Column="3" Content="Сброс" Padding="16,8" />
+      </Grid>
+      <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" Margin="0,0,0,12">
+        <StackPanel><TextBlock Text="Время" Foreground="#626873" /><TextBlock x:Name="TimeMetric" FontSize="22" /></StackPanel>
+        <StackPanel Grid.Column="1"><TextBlock Text="Знаков в минуту" Foreground="#626873" /><TextBlock x:Name="SpeedMetric" FontSize="22" /></StackPanel>
+        <StackPanel Grid.Column="2"><TextBlock Text="Точность" Foreground="#626873" /><TextBlock x:Name="AccuracyMetric" FontSize="22" /></StackPanel>
+        <StackPanel Grid.Column="3"><TextBlock Text="Ошибки" Foreground="#626873" /><TextBlock x:Name="ErrorsMetric" FontSize="22" /></StackPanel>
+      </Grid>
+      <TextBlock x:Name="StatusText" Grid.Row="2" TextWrapping="Wrap" MinHeight="28" Margin="0,0,0,8" Foreground="#46505C" />
+      <Border Grid.Row="3" Background="White" BorderBrush="#D8DCE2" BorderThickness="1" Padding="16" Margin="0,0,0,12">
+        <ScrollViewer x:Name="TargetScroller" VerticalScrollBarVisibility="Auto">
+          <TextBlock x:Name="TargetBlock" TextWrapping="Wrap" />
+        </ScrollViewer>
+      </Border>
+      <TextBox x:Name="InputBox" Grid.Row="4" AcceptsReturn="True" TextWrapping="Wrap"
+               IsReadOnly="True" PlaceholderText="Нажмите «Начать»" Padding="12"
+               ScrollViewer.VerticalScrollBarVisibility="Auto" />
+      <StackPanel x:Name="KeyboardPanel" Grid.Row="5" Spacing="5" Margin="0,16,0,0" />
+    </Grid>
+    <TabControl Grid.Column="1">
+      <TabItem Header="Настройки">
+        <StackPanel Margin="12,20" Spacing="14">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Размер шрифта" />
+            <TextBlock x:Name="FontSizeValue" Grid.Column="1" />
+          </Grid>
+          <Slider x:Name="FontSizeSlider" Minimum="10" Maximum="30" TickFrequency="1" IsSnapToTickEnabled="True" />
+          <CheckBox x:Name="ShowKeyboardInput" Content="Показывать клавиатуру" />
+          <CheckBox x:Name="CaseSensitiveInput" Content="Учитывать регистр" />
+          <Button x:Name="SaveSettingsButton" Content="Применить" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+        </StackPanel>
+      </TabItem>
+      <TabItem Header="Статистика">
+        <Grid Margin="8,20" RowDefinitions="Auto,*,Auto,Auto">
+          <TextBlock x:Name="SummaryText" TextWrapping="Wrap" Margin="0,0,0,14" />
+          <ListBox x:Name="StatisticsList" Grid.Row="1" Background="Transparent">
+            <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,4" /></DataTemplate></ListBox.ItemTemplate>
+          </ListBox>
+          <Button x:Name="ClearStatisticsButton" Grid.Row="2" Content="Очистить статистику" Margin="0,12,0,0" />
+          <StackPanel x:Name="ClearConfirmation" Grid.Row="3" IsVisible="False" Margin="0,10,0,0" Spacing="8">
+            <TextBlock Text="Удалить все результаты?" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button x:Name="ConfirmClearButton" Content="Удалить" />
+              <Button x:Name="CancelClearButton" Content="Отмена" />
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+      </TabItem>
+      <TabItem Header="Материалы">
+        <StackPanel Margin="12,20" Spacing="14">
+          <TextBlock Text="Анализ результатов" FontWeight="SemiBold" />
+          <Button x:Name="OpenNotebookButton" Content="Открыть notebook" />
+        </StackPanel>
+      </TabItem>
+    </TabControl>
+  </Grid>
+</Window>
