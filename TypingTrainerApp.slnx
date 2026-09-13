@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="TypingTrainer/TypingTrainer.csproj" />
+  <Project Path="SimpleMap/SimpleMap.csproj" />
 </Solution>

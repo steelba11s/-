@@ -71,12 +71,6 @@
           </StackPanel>
         </Grid>
       </TabItem>
-      <TabItem Header="Материалы">
-        <StackPanel Margin="12,20" Spacing="14">
-          <TextBlock Text="Анализ результатов" FontWeight="SemiBold" />
-          <Button x:Name="OpenNotebookButton" Content="Открыть notebook" />
-        </StackPanel>
-      </TabItem>
     </TabControl>
   </Grid>
 </Window>

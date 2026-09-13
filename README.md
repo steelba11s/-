@@ -4,7 +4,7 @@
 
 ## Запуск из терминала
 
-Откройте PowerShell в этой папке. Нужен .NET SDK: для тренажёра — 9 или 10 с установленной средой выполнения .NET 9, для Markdown — 10.
+Откройте PowerShell в этой папке. Нужен .NET SDK 9 или 10 с установленной средой выполнения .NET 9.
 
 Тренажёр:
 
@@ -12,24 +12,26 @@
 dotnet run --project .\TypingTrainer\TypingTrainer.csproj
 ```
 
-Markdown-редактор:
-
-```powershell
-dotnet run --project .\MarkdownEditor\MarkdownEditor.App\MarkdownEditor.App.csproj
-```
-
 ## Запуск через файлы
 
 - Тренажёр: дважды нажмите `TypingTrainer\Start.cmd`.
-- Markdown-редактор: дважды нажмите `MarkdownEditor\Start.cmd`.
 
-Эти файлы собирают и запускают актуальные исходники через .NET SDK. При первом запуске нужен доступ к NuGet для загрузки зависимостей.
+Этот файл собирает и запускает актуальные исходники через .NET SDK. При первом запуске нужен доступ к NuGet для загрузки зависимостей.
 
-После сборки можно открыть программы напрямую (нужна соответствующая среда выполнения .NET):
+После сборки можно открыть программу напрямую (нужна соответствующая среда выполнения .NET):
 
 - `TypingTrainer\bin\Debug\net9.0\TypingTrainer.exe`.
-- `MarkdownEditor\MarkdownEditor.App\bin\Debug\net10.0\MarkdownEditor.exe`.
 
-Для работы в IDE откройте `TypingTrainerApp.slnx` или `MarkdownEditor\MarkdownEditor.slnx`.
+Для работы в IDE откройте `TypingTrainerApp.slnx`.
 
-В каждом решении один проект приложения. Логика включена в него; отдельных проектов Core и Tests нет.
+В решении один проект приложения. Логика включена в него; отдельных проектов Core и Tests нет.
+
+## Простая карта
+
+В папке `SimpleMap` находится отдельное приложение: карта OpenStreetMap через интернет, перемещение, масштабирование и поиск адреса.
+
+```powershell
+dotnet run --project .\SimpleMap\SimpleMap.csproj
+```
+
+Можно также запустить `SimpleMap\Start.cmd` или открыть `SimpleMap\SimpleMap.slnx`. Подробности — в [SimpleMap/README.md](SimpleMap/README.md).

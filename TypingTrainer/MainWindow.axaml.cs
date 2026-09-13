@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
@@ -20,6 +19,9 @@ public partial class MainWindow : Window
     private static readonly IBrush CorrectBrush = Brush.Parse("#167552");
     private static readonly IBrush ErrorBrush = Brush.Parse("#C22E40");
     private static readonly IBrush CurrentBrush = Brush.Parse("#1768BD");
+    private static readonly IBrush CorrectTextBackground = Brush.Parse("#C8EBDD");
+    private static readonly IBrush ErrorTextBackground = Brush.Parse("#FFD1D8");
+    private static readonly IBrush KeyBorderBrush = Brush.Parse("#D8DCE2");
 
     public MainWindow() : this(new AppDataStore()) { }
 
@@ -55,7 +57,6 @@ public partial class MainWindow : Window
         ClearStatisticsButton.Click += (_, _) => ClearConfirmation.IsVisible = true;
         CancelClearButton.Click += (_, _) => ClearConfirmation.IsVisible = false;
         ConfirmClearButton.Click += (_, _) => ClearStatistics();
-        OpenNotebookButton.Click += (_, _) => OpenNotebook();
         _timer.Tick += (_, _) => UpdateMetrics();
         Closed += (_, _) => _timer.Stop();
         ApplySettings();
@@ -138,7 +139,11 @@ public partial class MainWindow : Window
         {
             var run = new Run(text[i].ToString());
             if (i < _session.Input.Length)
-                run.Foreground = _session.Matches(_session.Input[i], text[i]) ? CorrectBrush : ErrorBrush;
+            {
+                var correct = _session.Matches(_session.Input[i], text[i]);
+                run.Foreground = correct ? CorrectBrush : ErrorBrush;
+                run.Background = correct ? CorrectTextBackground : ErrorTextBackground;
+            }
             else if (_session.IsActive && i == _session.Input.Length)
             {
                 run.Foreground = CurrentBrush;
@@ -185,8 +190,8 @@ public partial class MainWindow : Window
         _keys.Clear();
         var english = (TextCombo.SelectedItem as WordDictionary)?.Name.StartsWith("Text", StringComparison.Ordinal) == true;
         var rows = english
-            ? new[] { "1234567890-", "qwertyuiop[]", "asdfghjkl;'", "zxcvbnm,./" }
-            : new[] { "1234567890-", "йцукенгшщзхъ", "фывапролджэ", "ячсмитьбю." };
+            ? new[] { "`1234567890-=", "qwertyuiop[]", "asdfghjkl;'", "zxcvbnm,./" }
+            : new[] { "ё1234567890-=", "йцукенгшщзхъ", "фывапролджэ", "ячсмитьбю." };
         foreach (var letters in rows)
         {
             var row = new Grid();
@@ -210,14 +215,16 @@ public partial class MainWindow : Window
         bottom.Children.Add(space);
         bottom.Children.Add(back);
         _keys[' '] = space;
-        if (!english) _keys[','] = _keys['.'];
+        var shifted = english ? "~!@#$%^&*()_+{}:\"<>?" : "!\"№;%:?*()_+,";
+        var unshifted = english ? "`1234567890-=[];',./" : "1234567890-=.";
+        for (var i = 0; i < shifted.Length; i++) _keys[shifted[i]] = _keys[unshifted[i]];
         KeyboardPanel.Children.Add(bottom);
     }
 
     private static Border CreateKey(string label) => new()
     {
         Height = 32, Margin = new Thickness(2, 0), CornerRadius = new CornerRadius(4),
-        Background = Brushes.White, BorderBrush = Brush.Parse("#D8DCE2"), BorderThickness = new Thickness(1),
+        Background = Brushes.White, BorderBrush = KeyBorderBrush, BorderThickness = new Thickness(1),
         Child = new TextBlock
         {
             Text = label, FontSize = 12,
@@ -228,14 +235,32 @@ public partial class MainWindow : Window
 
     private void HighlightNextKey()
     {
-        foreach (var key in _keys.Values) key.Background = Brushes.White;
-        if (_shiftKey != null) _shiftKey.Background = Brushes.White;
+        foreach (var key in _keys.Values.Distinct())
+        {
+            key.Background = Brushes.White;
+            key.BorderBrush = KeyBorderBrush;
+            key.BorderThickness = new Thickness(1);
+        }
+        if (_shiftKey != null)
+        {
+            _shiftKey.Background = Brushes.White;
+            _shiftKey.BorderBrush = KeyBorderBrush;
+            _shiftKey.BorderThickness = new Thickness(1);
+        }
+
         if (!_session.IsActive || _session.Input.Length >= _session.Target.Length) return;
         var c = _session.Target[_session.Input.Length];
-        if (_keys.TryGetValue(char.ToLowerInvariant(c), out var next)) next.Background = Brush.Parse("#C8EBDD");
+        if (_keys.TryGetValue(char.ToLowerInvariant(c), out var next))
+        {
+            next.BorderBrush = CurrentBrush;
+            next.BorderThickness = new Thickness(2);
+        }
         var english = (TextCombo.SelectedItem as WordDictionary)?.Name.StartsWith("Text", StringComparison.Ordinal) == true;
         if (_shiftKey != null && ((_session.CaseSensitive && char.IsUpper(c)) || (!english && c == ',')))
-            _shiftKey.Background = Brush.Parse("#C8EBDD");
+        {
+            _shiftKey.BorderBrush = CurrentBrush;
+            _shiftKey.BorderThickness = new Thickness(2);
+        }
     }
 
     private void RefreshStatistics()
@@ -266,17 +291,4 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OpenNotebook()
-    {
-        var path = Path.Combine(AppContext.BaseDirectory, "typing-trainer-notebook.ipynb");
-        try
-        {
-            if (!File.Exists(path)) throw new FileNotFoundException("Файл notebook не найден.");
-            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
-        }
-        catch (Exception ex) when (ex is IOException or System.ComponentModel.Win32Exception or InvalidOperationException)
-        {
-            StatusText.Text = "Не удалось открыть notebook. Откройте его в VS Code с Polyglot Notebooks. " + ex.Message;
-        }
-    }
 }

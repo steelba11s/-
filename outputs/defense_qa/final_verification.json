@@ -1,16 +1,13 @@
 [
   {
-    "file": "Markdown редактор — подготовка к защите.docx",
-    "bytes": 607744,
-    "pages": 21,
-    "paragraphs": 322,
-    "checked": "source matched; all page images reviewed; code and tables readable"
-  },
-  {
-    "file": "Тренажёр набора текста — подготовка к защите.docx",
-    "bytes": 574405,
+    "file": "Тренажёр набора текста — подготовка к защите.pdf",
     "pages": 17,
-    "paragraphs": 268,
-    "checked": "source matched; all page images reviewed; code and tables readable"
+    "changed_pages": [
+      4,
+      6,
+      7,
+      5
+    ],
+    "checked": "Editor references replaced with generic examples; text extraction checked. Other trainer content unchanged."
   }
 ]

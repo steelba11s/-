@@ -18,7 +18,7 @@ def pdfium_convert(pdf_path,dpi,output_folder,**kwargs):
     return paths
 renderer.convert_from_path=pdfium_convert
 report={}
-for key,prefix in [('trainer','Тренажёр'),('editor','Markdown')]:
+for key,prefix in [('trainer','Тренажёр')]:
     docx=next((ROOT.parents[1]/'Материалы для защиты').glob(prefix+'*.docx'))
     pages=renderer.rasterize(str(docx),str(ROOT/key),110,False,False)
     pdf=PdfReader(ROOT/(docx.stem+'.pdf'))

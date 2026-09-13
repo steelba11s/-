@@ -26,7 +26,7 @@ def contract():
         inv={n:{'bytes':len(z.read(n)),'sha256':sha256(z.read(n)).hexdigest()} for n in z.namelist()}
     (QA/'reference-parts.json').write_text(json.dumps(inv,indent=2),encoding='utf-8')
     sect=ref.sections[0]
-    text=f'''# Contract for two beginner defense guides
+    text=f'''# Contract for the typing trainer defense guide
 Reference: {REF}
 SHA256: {baseline_hash}
 Reference pages: 7; sections: 1. Reference rendered by Word COM after packaged renderer failed because bundled LibreOffice is unavailable on Windows. All seven page PNGs inspected.
@@ -113,7 +113,7 @@ def table(d,rows):
     d.add_paragraph().paragraph_format.space_after=Pt(2)
 
 def figure(d,key):
-    path=ROOT/('TypingTrainer.Tests/bin/Debug/net9.0/screenshots/trainer-1240x800.png' if key=='trainer' else 'MarkdownEditor/MarkdownEditor.Tests/bin/Debug/net10.0/screenshots/editor-1320x840.png')
+    path=ROOT/'TypingTrainer.Tests/bin/Debug/net9.0/screenshots/trainer-1240x800.png'
     p=d.add_paragraph();p.paragraph_format.keep_with_next=True
     p.add_run().add_picture(str(path),width=Inches(7.0))
 
@@ -150,7 +150,7 @@ def build(key,title,filename):
     para(d,'Как пользоваться пособием','h2')
     para(d,'Первый проход — основы C# и Avalonia. Второй — устройство именно этого приложения с открытыми рядом исходниками. Третий — вопросы, речь и демонстрация. Короткие примеры кода можно читать как перевод обычного действия на язык программы.')
     para(d,'Если до защиты остался час, прочитай основной сценарий, архитектуру, ключевые алгоритмы и ограничения, затем проговори речь и выполни план демонстрации. После этого вернись к незнакомым словам в начальных разделах.')
-    table(d,[['Сведения','Значение'],['Приложение',title],['Исходники', 'TypingTrainerApp.slnx' if key=='trainer' else 'MarkdownEditor/MarkdownEditor.slnx'],['Дата проверки','11 сентября 2026'],['Автоматические тесты','15 пройдено' if key=='trainer' else '16 пройдено']])
+    table(d,[['Сведения','Значение'],['Приложение',title],['Исходники', 'TypingTrainerApp.slnx'],['Дата проверки','11 сентября 2026'],['Автоматические тесты','15 пройдено']])
     d.add_page_break()
     common=(QA/'common.md').read_text(encoding='utf-8')
     content=(QA/(key+'.md')).read_text(encoding='utf-8')
@@ -158,10 +158,9 @@ def build(key,title,filename):
     n=markdown(d,content,n)
     para(d,f'{n+1} Где проверить объяснения','h1')
     para(d,'Главный источник описания приложения — его исходники. Имена классов и методов в тексте позволяют найти соответствующий участок поиском в редакторе кода. Версии библиотек указаны по .csproj, результаты тестов — по запуску 11 сентября 2026 года. Учебные фрагменты отдельно названы учебными; основные алгоритмы приведены из проекта.')
-    for x in (['TypingTrainer.Core/TypingSession.cs — состояние попытки, сравнение и формулы.','TypingTrainer.Core/AppDataStore.cs и Models.cs — сохранение и модели данных.','TypingTrainer/MainWindow.axaml и MainWindow.axaml.cs — окно и обработчики.','TypingTrainer.Tests/CoreTests.cs и WindowTests.cs — проверяемые сценарии.','typing-trainer-notebook.ipynb — анализ истории.'] if key=='trainer' else ['MarkdownEditor.Core/EditorViewModel.cs — команды и правила смены документа.','MarkdownEditor.Core/DocumentFiles.cs — кодировка, отпечаток и запись.','MarkdownEditor.Core/WorkspaceFiles.cs — дерево и поиск.','MarkdownEditor.Core/MarkdownDocument.cs — Pipeline и HTML.','MarkdownEditor.App/MainWindow.axaml.cs и MarkdownPreview.cs — обновление и показ.','MarkdownEditor.Tests/CoreTests.cs и WindowTests.cs — проверяемые сценарии.']):para(d,x)
+    for x in ['TypingTrainer.Core/TypingSession.cs — состояние попытки, сравнение и формулы.','TypingTrainer.Core/AppDataStore.cs и Models.cs — сохранение и модели данных.','TypingTrainer/MainWindow.axaml и MainWindow.axaml.cs — окно и обработчики.','TypingTrainer.Tests/CoreTests.cs и WindowTests.cs — проверяемые сценарии.','typing-trainer-notebook.ipynb — анализ истории.']:para(d,x)
     para(d,'Официальные материалы для уточнения терминов','h2')
     sources=[('Microsoft Learn — обзор языка C#','https://learn.microsoft.com/en-us/dotnet/csharp/tour-of-csharp/'),('Microsoft Learn — асинхронное программирование','https://learn.microsoft.com/en-us/dotnet/csharp/asynchronous-programming/'),('Avalonia — контекст данных','https://docs.avaloniaui.net/docs/data-binding/data-context'),('Avalonia — синтаксис привязки','https://docs.avaloniaui.net/docs/data-binding/data-binding-syntax'),('Avalonia — MVVM','https://docs.avaloniaui.net/docs/fundamentals/the-mvvm-pattern')]
-    if key=='editor':sources.append(('Markdig — официальный репозиторий и описание','https://github.com/xoofx/markdig'))
     for label,url in sources:
         p=para(d,label+'\n'+url);p.paragraph_format.space_after=Pt(5);p.alignment=WD_ALIGN_PARAGRAPH.LEFT
     # Replace visible footer metadata while retaining source section furniture.
@@ -191,4 +190,3 @@ def build(key,title,filename):
     print(json.dumps({'path':str(path),'paragraphs':len(d.paragraphs),'words':len(' '.join(p.text for p in d.paragraphs).split()),'changed_parts':changed},ensure_ascii=False))
 
 build('trainer','Тренажёр набора текста','Тренажёр набора текста — подготовка к защите.docx')
-build('editor','Markdown редактор','Markdown редактор — подготовка к защите.docx')

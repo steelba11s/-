@@ -1,0 +1,58 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:SimpleMap"
+        xmlns:maps="clr-namespace:Mapsui.UI.Avalonia;assembly=Mapsui.UI.Avalonia"
+        x:Class="SimpleMap.MainWindow" Title="Простая карта"
+        Width="1120" Height="760" MinWidth="720" MinHeight="500"
+        WindowStartupLocation="CenterScreen" Background="#F5F7FA">
+  <Grid RowDefinitions="Auto,*,Auto">
+    <Border Background="White" BorderBrush="#E1E5EB" BorderThickness="0,0,0,1" Padding="20,14">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel VerticalAlignment="Center" Margin="0,0,28,0">
+          <TextBlock Text="Простая карта" FontSize="19" FontWeight="SemiBold" />
+          <TextBlock Text="Найдите нужный адрес" FontSize="12" Foreground="#687586" />
+        </StackPanel>
+        <TextBox x:Name="SearchBox" Grid.Column="1" PlaceholderText="Город, улица, дом" MaxLength="200"
+                 VerticalContentAlignment="Center" KeyDown="SearchKeyDown" />
+        <Button x:Name="SearchButton" Grid.Column="2" Content="Найти" Click="SearchClick"
+                Margin="10,0,0,0" Padding="22,8" Background="#2463D4" Foreground="White" />
+      </Grid>
+    </Border>
+    <Grid Grid.Row="1">
+      <maps:MapControl x:Name="MapView" />
+      <Border x:Name="ResultsPanel" IsVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top"
+              Width="330" MaxHeight="430" Margin="16" Padding="8" Background="White"
+              BorderBrush="#DCE2EA" BorderThickness="1" CornerRadius="8" BoxShadow="0 3 12 0 #20000000">
+        <Grid RowDefinitions="Auto,*">
+          <Grid ColumnDefinitions="*,Auto" Margin="8,0,0,6">
+            <TextBlock Text="Результаты поиска" FontWeight="SemiBold" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="×" Click="CloseResultsClick" ToolTip.Tip="Скрыть результаты" />
+          </Grid>
+          <ListBox x:Name="ResultsList" Grid.Row="1" SelectionChanged="ResultSelected" Background="Transparent">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="local:AddressResult">
+                <StackPanel Spacing="4" Margin="2,8">
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding Address}" FontSize="12" Foreground="#687586" TextWrapping="Wrap" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Border>
+      <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="16" Spacing="6">
+        <Button x:Name="ZoomInButton" Content="+" Click="ZoomInClick" Width="44" Height="44" FontSize="24"
+                Background="White" ToolTip.Tip="Приблизить" />
+        <Button x:Name="ZoomOutButton" Content="−" Click="ZoomOutClick" Width="44" Height="44" FontSize="24"
+                Background="White" ToolTip.Tip="Отдалить" />
+      </StackPanel>
+      <Button Content="© OpenStreetMap contributors" Click="AttributionClick" FontSize="11"
+              HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="White"
+              MinHeight="26" Padding="8,4" Margin="6" />
+    </Grid>
+    <Border Grid.Row="2" Background="White" BorderBrush="#E1E5EB" BorderThickness="0,1,0,0" Padding="16,10">
+      <TextBlock x:Name="StatusText" Text="Перетаскивайте карту мышью. Колесо или + / − меняют масштаб."
+                 Foreground="#526174" FontSize="12" TextWrapping="Wrap" />
+    </Border>
+  </Grid>
+</Window>

@@ -1,4 +1,4 @@
-# Contract for two beginner defense guides
+# Contract for the typing trainer defense guide
 Reference: C:\Users\Artur\.codex\plugins\cache\openai-curated-remote\openai-templates\0.1.1\skills\artifact-template-system-design\assets\reference.docx
 SHA256: 13504f6c221a42c1726460a9e865e563355539ff97d702d6c9b2267b4b261d76
 Reference pages: 7; sections: 1. Reference rendered by Word COM after packaged renderer failed because bundled LibreOffice is unavailable on Windows. All seven page PNGs inspected.
